@@ -1,11 +1,11 @@
-package com.example.wangpeijian.miniweather;
+package com.example.wangpeijian.miniweather.myweather;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,16 +14,13 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.wangpeijian.miniweather.R;
 import com.example.wangpeijian.miniweather.bean.TodayWeather;
 import com.example.wangpeijian.miniweather.util.NetUtil;
-
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -31,9 +28,15 @@ import java.net.URL;
  * Created by wangpeijian on 2016/9/21.
  */
 public class MainActivity extends Activity implements View.OnClickListener{
+    class A{
+        public void printf(){
+            Log.d("my_test","helloA");
+        }
+    };
     private ImageView mUpdateBtn;
     private TextView cityTv, timeTv, humidityTv, weekTv, pmDataTv, pmQualityTv,  temperatureTv, climateTv, windTv, city_name_Tv;
     private ImageView weatherImg, pmImg;
+    private ImageView mSelectCity;
     private static final int UPDATE_TODAY_WEATHER = 1;
     private Handler mHandler = new Handler() {
         public void handleMessage(android.os.Message msg) {
@@ -83,6 +86,9 @@ public class MainActivity extends Activity implements View.OnClickListener{
         }
         mUpdateBtn = (ImageView) findViewById(R.id.title_update_btn);
         mUpdateBtn.setOnClickListener(this);
+        mSelectCity = (ImageView)findViewById(R.id.title_city_manager);
+        mSelectCity.setOnClickListener(this);
+        Log.d("my_app","MainActivity->onCreate");
         initView();
     }
     @Override
@@ -111,13 +117,33 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 Toast.makeText(MainActivity.this,"网络挂了!", Toast.LENGTH_LONG).show();
             }
 
+        } else if(view.getId()==R.id.title_city_manager) {
+            Intent intent = new Intent(this,SelectCity.class);
+            startActivityForResult(intent,1);
         } else {
-            Log.d("my_weather","hello");
-            Toast.makeText(MainActivity.this,"网络挂了!", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    protected void onActivityResult(int requestCode,int resultCode,Intent data){
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            String newCityCode= data.getStringExtra("cityCode");
+            SharedPreferences sharedPreferences=getSharedPreferences("config",MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("main_city_code",newCityCode);
+            editor.commit();
+            Log.d("myWeather", "选择的城市代码为"+newCityCode);
+            if (NetUtil.getNetWorkState(this) != NetUtil.NETWORK_NONE) {
+                Log.d("myWeather", "网络OK");
+                queryWeather(newCityCode);
+            } else {
+                Log.d("myWeather", "网络挂了");
+                Toast.makeText(MainActivity.this, "网络挂了！", Toast.LENGTH_LONG).show();
+            }
         }
     }
     private void  queryWeather(String cityCode){
         final String address="http://wthrcdn.etouch.cn/WeatherApi?citykey="+cityCode;
+        //final String address = "http://mobile100.zhangqx.com/calendar.html";
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -149,7 +175,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
                     }
                 }catch(Exception e){
-
                 }
             }
         }).start();
@@ -162,9 +187,10 @@ public class MainActivity extends Activity implements View.OnClickListener{
         pmDataTv.setText(todayWeather.getPm25());
         pmQualityTv.setText(todayWeather.getQuality());
         weekTv.setText(todayWeather.getDate());
-        temperatureTv.setText(todayWeather.getHigh()+"~"+todayWeather.getLow());
+        temperatureTv.setText(todayWeather.getLow()+"~"+todayWeather.getHigh());
         climateTv.setText(todayWeather.getType());
         windTv.setText("风力:"+todayWeather.getFengli());
         Toast.makeText(MainActivity.this,"更新成功！",Toast.LENGTH_SHORT).show();
+        //weatherImg.setImageResource(R.drawable.biz_plugin_weather_0_50);
     }
 }
