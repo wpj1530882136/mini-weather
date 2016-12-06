@@ -196,6 +196,34 @@ public class MainActivity extends Activity implements View.OnClickListener{
         weekTv.setText(todayWeather.getDate());
         temperatureTv.setText(todayWeather.getLow()+"~"+todayWeather.getHigh());
         climateTv.setText(todayWeather.getType());
+        switch(climateTv.getText().toString()){
+            case"多云":
+                weatherImg.setImageResource(R.drawable.biz_plugin_weather_duoyun);
+                break;
+            case "暴雨":
+                weatherImg.setImageResource(R.drawable.biz_plugin_weather_baoyu);
+                break;
+            case "暴雪":
+                weatherImg.setImageResource(R.drawable.biz_plugin_weather_baoxue);
+                break;
+            case "大暴雨":
+                weatherImg.setImageResource(R.drawable.biz_plugin_weather_dabaoyu);
+                break;
+            case"大雪":
+                weatherImg.setImageResource(R.drawable.biz_plugin_weather_daxue);
+                break;
+            case"雷阵雨":
+                weatherImg.setImageResource(R.drawable.biz_plugin_weather_leizhenyu);
+                break;
+            case"小雨":
+                weatherImg.setImageResource(R.drawable.biz_plugin_weather_xiaoyu);
+            case"小雪":
+                weatherImg.setImageResource(R.drawable.biz_plugin_weather_xiaoxue);
+                break;
+            default:
+                weatherImg.setImageResource(R.drawable.biz_plugin_weather_qing);
+                break;
+        }
         windTv.setText("风力:"+todayWeather.getFengli());
         Toast.makeText(MainActivity.this,"更新成功！",Toast.LENGTH_SHORT).show();
         //weatherImg.setImageResource(R.drawable.biz_plugin_weather_0_50);

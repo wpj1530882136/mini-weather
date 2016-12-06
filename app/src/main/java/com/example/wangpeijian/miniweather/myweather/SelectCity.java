@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.content.Intent;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.util.Log;
 import com.example.wangpeijian.miniweather.R;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
  */
 public class SelectCity extends Activity implements View.OnClickListener {
     private ImageView mBackBtn;
+    private TextView mTitleName;
     private ListView mlistView;
     private EditText mEditText;
     MyApplication myApplication;
@@ -73,6 +75,7 @@ public class SelectCity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState){
         setContentView(R.layout.select_city);
         super.onCreate(savedInstanceState);
+        mTitleName = (TextView)findViewById(R.id.title_name);
         mBackBtn = (ImageView)findViewById(R.id.title_back);
         mBackBtn.setOnClickListener(this);
         myApplication = MyApplication.getInstance();
@@ -92,12 +95,7 @@ public class SelectCity extends Activity implements View.OnClickListener {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Toast.makeText(SelectCity.this,"你选择了:"+tmp_data.get(i),Toast.LENGTH_SHORT).show();
-               /* Intent intent = new Intent();
-                int pos = myApplication.getCityPos(tmp_data.get(i));
-                intent.putExtra("cityCode",myApplication.getCityNum(pos));
-                Log.d("my_test",myApplication.getCityNum(pos));
-                setResult(RESULT_OK,intent);
-                finish();*/
+                mTitleName.setText("当前城市："+tmp_data.get(i));
             }
         });
         initEditText();
@@ -107,10 +105,12 @@ public class SelectCity extends Activity implements View.OnClickListener {
         switch (view.getId()){
             case R.id.title_back:
                 Intent intent = new Intent();
-                intent.putExtra("cityCode","101160101");
-                Log.d("my_error","helo");
+                int start_pos = mTitleName.getText().toString().indexOf('：');
+                int end_pos =  mTitleName.getText().toString().length();
+                int pos = myApplication.getCityPos(mTitleName.getText().subSequence(start_pos+1,end_pos).toString());
+                intent.putExtra("cityCode",myApplication.getCityNum(pos));
                 setResult(RESULT_OK,intent);
-               // finish();
+                finish();
                 break;
             default:
                 break;
