@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.util.Log;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,12 +29,8 @@ import java.net.URL;
  * Created by wangpeijian on 2016/9/21.
  */
 public class MainActivity extends Activity implements View.OnClickListener{
-    class A{
-        public void printf(){
-            Log.d("my_test","helloA");
-        }
-    };
     private ImageView mUpdateBtn;
+    private ProgressBar mUpdateProgressBar;
     private TextView cityTv, timeTv, humidityTv, weekTv, pmDataTv, pmQualityTv,  temperatureTv, climateTv, windTv, city_name_Tv;
     private ImageView weatherImg, pmImg;
     private ImageView mSelectCity;
@@ -43,6 +40,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
             switch (msg.what) {
                 case UPDATE_TODAY_WEATHER:
                     updateTodayWeather((TodayWeather) msg.obj);
+                    mUpdateBtn.setVisibility(View.VISIBLE);
+                    mUpdateProgressBar.setVisibility(View.INVISIBLE);
                     break;
                 default:
                     break;
@@ -62,6 +61,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
         climateTv = (TextView) findViewById(R.id.climate);
         windTv = (TextView) findViewById(R.id.wind);
         weatherImg = (ImageView) findViewById(R.id.weather_img);
+        mUpdateProgressBar = (ProgressBar) findViewById(R.id.title_update_progress);
+        /*
         city_name_Tv.setText("N/A");
         cityTv.setText("N/A");
         timeTv.setText("N/A");
@@ -72,6 +73,10 @@ public class MainActivity extends Activity implements View.OnClickListener{
         temperatureTv.setText("N/A");
         climateTv.setText("N/A");
         windTv.setText("N/A");
+        */
+        SharedPreferences sharedPreferences=getSharedPreferences("config",MODE_PRIVATE);
+        String cityCode=sharedPreferences.getString("main_city_code","101010100");
+        queryWeather(cityCode);
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,6 +112,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
     public void onClick(View view){
         Log.d("my_weather","onClick");
         if(view.getId() == R.id.title_update_btn){
+            mUpdateBtn.setVisibility(View.INVISIBLE);
+            mUpdateProgressBar.setVisibility(View.VISIBLE);
             SharedPreferences sharedPreferences=getSharedPreferences("config",MODE_PRIVATE);
             String cityCode=sharedPreferences.getString("main_city_code","101010100");
             Log.d("my_weather",cityCode);

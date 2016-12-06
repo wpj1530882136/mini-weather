@@ -96,4 +96,10 @@ public class MyApplication extends Application {
     public int getCityListSize(){
         return mCityList.size();
     }
+    public int getCityPos(String cityName){
+        for(int i=0;i<mCityList.size();i++){
+            if(mCityList.get(i).getCity().equals(cityName))return i;
+        }
+        return -1;
+    }
 }
