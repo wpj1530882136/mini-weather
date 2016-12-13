@@ -15,7 +15,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
 import com.example.wangpeijian.miniweather.R;
+import com.example.wangpeijian.miniweather.bean.MyLocationListener;
 import com.example.wangpeijian.miniweather.bean.TodayWeather;
 import com.example.wangpeijian.miniweather.util.NetUtil;
 
@@ -34,7 +38,10 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private TextView cityTv, timeTv, humidityTv, weekTv, pmDataTv, pmQualityTv,  temperatureTv, climateTv, windTv, city_name_Tv;
     private ImageView weatherImg, pmImg;
     private ImageView mSelectCity;
+    private ImageView mLocationBtn;
     private static final int UPDATE_TODAY_WEATHER = 1;
+    public LocationClient mLocationClient = null;
+    public BDLocationListener myListener = new MyLocationListener();
     private Handler mHandler = new Handler() {
         public void handleMessage(android.os.Message msg) {
             switch (msg.what) {
@@ -62,6 +69,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
         windTv = (TextView) findViewById(R.id.wind);
         weatherImg = (ImageView) findViewById(R.id.weather_img);
         mUpdateProgressBar = (ProgressBar) findViewById(R.id.title_update_progress);
+        mUpdateProgressBar.setVisibility(View.INVISIBLE);
+        mLocationBtn = (ImageView)findViewById(R.id.title_location);
         /*
         city_name_Tv.setText("N/A");
         cityTv.setText("N/A");
@@ -95,6 +104,9 @@ public class MainActivity extends Activity implements View.OnClickListener{
         mSelectCity.setOnClickListener(this);
         Log.d("my_app","MainActivity->onCreate");
         initView();
+        mLocationClient = new LocationClient(getApplicationContext());
+        mLocationClient.registerLocationListener( myListener );
+        initLocation();
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -127,7 +139,9 @@ public class MainActivity extends Activity implements View.OnClickListener{
         } else if(view.getId()==R.id.title_city_manager) {
             Intent intent = new Intent(this,SelectCity.class);
             startActivityForResult(intent,1);
-        } else {
+        } else if(view.getId()==R.id.title_location) {
+            Toast.makeText(MainActivity.this,"定位", Toast.LENGTH_LONG).show();
+            mLocationClient.start();
         }
     }
 
@@ -227,5 +241,22 @@ public class MainActivity extends Activity implements View.OnClickListener{
         windTv.setText("风力:"+todayWeather.getFengli());
         Toast.makeText(MainActivity.this,"更新成功！",Toast.LENGTH_SHORT).show();
         //weatherImg.setImageResource(R.drawable.biz_plugin_weather_0_50);
+    }
+    private void initLocation(){
+        LocationClientOption option = new LocationClientOption();
+        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy
+        );//可选，默认高精度，设置定位模式，高精度，低功耗，仅设备
+        option.setCoorType("bd09ll");//可选，默认gcj02，设置返回的定位结果坐标系
+        int span=1000;
+        option.setScanSpan(span);//可选，默认0，即仅定位一次，设置发起定位请求的间隔需要大于等于1000ms才是有效的
+        option.setIsNeedAddress(true);//可选，设置是否需要地址信息，默认不需要
+        option.setOpenGps(true);//可选，默认false,设置是否使用gps
+        option.setLocationNotify(true);//可选，默认false，设置是否当GPS有效时按照1S/1次频率输出GPS结果
+        option.setIsNeedLocationDescribe(true);//可选，默认false，设置是否需要位置语义化结果，可以在BDLocation.getLocationDescribe里得到，结果类似于“在北京天安门附近”
+        option.setIsNeedLocationPoiList(true);//可选，默认false，设置是否需要POI结果，可以在BDLocation.getPoiList里得到
+        option.setIgnoreKillProcess(false);//可选，默认true，定位SDK内部是一个SERVICE，并放到了独立进程，设置是否在stop的时候杀死这个进程，默认不杀死
+        option.SetIgnoreCacheException(false);//可选，默认false，设置是否收集CRASH信息，默认收集
+        option.setEnableSimulateGps(false);//可选，默认false，设置是否需要过滤GPS仿真结果，默认需要
+        mLocationClient.setLocOption(option);
     }
 }
