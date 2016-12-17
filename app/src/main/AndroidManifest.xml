@@ -35,11 +35,13 @@
         </activity>
         <activity android:name=".myweather.SelectCity">
         </activity>
+        <activity android:name=".myweather.Location">
+        </activity>
         <service android:name="com.baidu.location.f" android:enabled="true" android:process=":remote">
         </service>
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="3MssF1OstCLP4g9Cm5PausOtCa5LVWPc" />
+            android:value="3x1VsoUBwFs1uTeZU937Z4dF8ptTAoBw" />
     </application>
 
 </manifest>

@@ -1,10 +1,12 @@
 package com.example.wangpeijian.miniweather.bean;
 
+import android.content.Intent;
 import android.util.Log;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.Poi;
+import com.example.wangpeijian.miniweather.myweather.Location;
 
 import java.util.List;
 
@@ -16,37 +18,27 @@ public class MyLocationListener implements BDLocationListener {
     public void onReceiveLocation(BDLocation location) {
         //Receive Location
         StringBuffer sb = new StringBuffer(256);
-        sb.append("time : ");
+        sb.append("时间 : ");
         sb.append(location.getTime());
-        sb.append("\nerror code : ");
-        sb.append(location.getLocType());
-        sb.append("\nlatitude : ");
+        sb.append("\n城市 :");
+        sb.append(location.getCity());
+        sb.append("\n经度 : ");
         sb.append(location.getLatitude());
-        sb.append("\nlontitude : ");
+        sb.append("\n纬度 : ");
         sb.append(location.getLongitude());
-        sb.append("\nradius : ");
+        sb.append("\n半径 : ");
         sb.append(location.getRadius());
         if (location.getLocType() == BDLocation.TypeGpsLocation){// GPS定位结果
-            sb.append("\nspeed : ");
-            sb.append(location.getSpeed());// 单位：公里每小时
-            sb.append("\nsatellite : ");
-            sb.append(location.getSatelliteNumber());
-            sb.append("\nheight : ");
-            sb.append(location.getAltitude());// 单位：米
-            sb.append("\ndirection : ");
-            sb.append(location.getDirection());// 单位度
-            sb.append("\naddr : ");
+            sb.append("\n地址 : ");
             sb.append(location.getAddrStr());
-            sb.append("\ndescribe : ");
+            sb.append("\n状态 : ");
             sb.append("gps定位成功");
 
         } else if (location.getLocType() == BDLocation.TypeNetWorkLocation){// 网络定位结果
-            sb.append("\naddr : ");
+            sb.append("\n地址 : ");
             sb.append(location.getAddrStr());
             //运营商信息
-            sb.append("\noperationers : ");
-            sb.append(location.getOperators());
-            sb.append("\ndescribe : ");
+            sb.append("\n状态 : ");
             sb.append("网络定位成功");
         } else if (location.getLocType() == BDLocation.TypeOffLineLocation) {// 离线定位结果
             sb.append("\ndescribe : ");
@@ -61,21 +53,18 @@ public class MyLocationListener implements BDLocationListener {
             sb.append("\ndescribe : ");
             sb.append("无法获取有效定位依据导致定位失败，一般是由于手机的原因，处于飞行模式下一般会造成这种结果，可以试着重启手机");
         }
-        sb.append("\nlocationdescribe : ");
-        sb.append(location.getLocationDescribe());// 位置语义化信息
-        sb.append("\ncity : ");
-        sb.append(location.getCity());
-        sb.append("\nstreet : ");
-        sb.append(location.getStreet());
         List<Poi> list = location.getPoiList();// POI数据
         if (list != null) {
-            sb.append("\npoilist size = : ");
-            sb.append(list.size());
             for (Poi p : list) {
-                sb.append("\npoi= : ");
-                sb.append(p.getId() + " " + p.getName() + " " + p.getRank());
+                sb.append("\n位置: ");
+                sb.append(p.getName());
             }
         }
         Log.i("BaiduLocationApiDem", sb.toString());
+        locationInfo = sb.toString();
     }
+    public String getLocationInfo(){
+        return locationInfo;
+    }
+    private String locationInfo="";
 }
