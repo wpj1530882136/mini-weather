@@ -15,12 +15,21 @@ public class TodayWeather {
     private String pm25;
     private String quality;
     private String fengxiang;
-    private String fengli;
 
-    private String date;
-    private String high;
-    private String low;
-    private String type;
+    private String []fengli;
+
+    private String []date;
+    private String []high;
+    private String []low;
+    private String []type;
+    public TodayWeather(){
+        fengli = new String[10];
+        date = new String[10];
+        high = new String[10];
+        low = new String[10];
+        type = new String[10];
+        Log.d("my_weather","hello create");
+    }
     public String getCity() {
         return city;
     }
@@ -49,24 +58,24 @@ public class TodayWeather {
         return fengxiang;
     }
 
-    public String getFengli() {
-        return fengli;
+    public String getFengli(int pos) {
+        return fengli[pos];
     }
 
-    public String getDate() {
-        return date;
+    public String getDate(int pos) {
+        return date[pos];
     }
 
-    public String getHigh() {
-        return high;
+    public String getHigh(int pos) {
+        return high[pos];
     }
 
-    public String getLow() {
-        return low;
+    public String getLow(int pos) {
+        return low[pos];
     }
 
-    public String getType() {
-        return type;
+    public String getType(int pos) {
+        return type[pos];
     }
 
     public void setCity(String city) {
@@ -97,43 +106,24 @@ public class TodayWeather {
         this.fengxiang = fengxiang;
     }
 
-    public void setFengli(String fengli) {
-        this.fengli = fengli;
+    public void setFengli(int pos,String fengli) {
+        this.fengli[pos] = fengli;
     }
 
-    public void setHigh(String high) {
-        this.high = high;
+    public void setHigh(int pos,String high) {
+        this.high[pos] = high;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setDate(int pos, String date) {this.date[pos] = date;}
+
+    public void setLow(int pos,String low) {
+        this.low[pos] = low;
     }
 
-    public void setLow(String low) {
-        this.low = low;
+    public void setType(int pos,String type) {
+        this.type[pos] = type;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    @Override
-    public String toString() {
-        return "TodayWeather{" +
-                "city='" + city + '\'' +
-                ", updatetime='" + updatetime + '\'' +
-                ", wendu='" + wendu + '\'' +
-                ", shidu='" + shidu + '\'' +
-                ", pm25='" + pm25 + '\'' +
-                ", quality='" + quality + '\'' +
-                ", fengxiang='" + fengxiang + '\'' +
-                ", fengli='" + fengli + '\'' +
-                ", date='" + date + '\'' +
-                ", high='" + high + '\'' +
-                ", low='" + low + '\'' +
-                ", type='" + type + '\'' +
-                '}';
-    }
     public static TodayWeather parseXML(String xmldata){
         TodayWeather todayWeather = null;
         int fengxiangCount=0;
@@ -146,6 +136,7 @@ public class TodayWeather {
             XmlPullParserFactory fac = XmlPullParserFactory.newInstance();
             XmlPullParser xmlPullParser = fac.newPullParser();
             xmlPullParser.setInput(new StringReader(xmldata));
+            boolean is_day = true;
             int eventType = xmlPullParser.getEventType();
             Log.d("myWeather", "parseXML");
             while (eventType != XmlPullParser.END_DOCUMENT) {
@@ -157,6 +148,8 @@ public class TodayWeather {
                              todayWeather= new TodayWeather();
                          }
                          if (todayWeather != null) {
+                             if(xmlPullParser.getName().equals("day")) is_day = true;
+                             else if(xmlPullParser.getName().equals("night"))is_day = false;
                              if (xmlPullParser.getName().equals("city")) {
                                  eventType = xmlPullParser.next() ;
                                  todayWeather.setCity(xmlPullParser.getText());
@@ -175,29 +168,29 @@ public class TodayWeather {
                              } else if (xmlPullParser.getName().equals("quality")) {
                                  eventType = xmlPullParser.next() ;
                                  todayWeather.setQuality(xmlPullParser.getText());
-                             } else if (xmlPullParser.getName().equals("fengxiang") && fengxiangCount == 0) {
+                             } else if (xmlPullParser.getName().equals("fengxiang")&&fengxiangCount==0) {
                                  eventType = xmlPullParser.next() ;
                                  todayWeather.setFengxiang(xmlPullParser.getText());
                                  fengxiangCount++;
-                             } else if (xmlPullParser.getName().equals("fengli") && fengliCount == 0) {
+                             } else if (xmlPullParser.getName().equals("fengli")&&fengliCount<=4&&is_day) {
                                  eventType = xmlPullParser.next() ;
-                                 todayWeather.setFengli(xmlPullParser.getText());
+                                 todayWeather.setFengli(fengliCount, xmlPullParser.getText());
                                  fengliCount++;
-                             } else if (xmlPullParser.getName().equals("date") && dateCount == 0) {
+                             } else if (xmlPullParser.getName().equals("date")&&dateCount<=4) {
                                  eventType = xmlPullParser.next() ;
-                                 todayWeather.setDate(xmlPullParser.getText());
+                                 todayWeather.setDate(dateCount, xmlPullParser.getText());
                                  dateCount++;
-                             } else if (xmlPullParser.getName().equals("high") && highCount == 0) {
+                             } else if (xmlPullParser.getName().equals("high")&&highCount<=4) {
                                  eventType = xmlPullParser.next() ;
-                                 todayWeather.setHigh(xmlPullParser.getText().substring(2).trim());
+                                 todayWeather.setHigh(highCount,xmlPullParser.getText().substring(2).trim());
                                  highCount++;
-                             } else if (xmlPullParser.getName().equals("low") && lowCount == 0) {
+                             } else if (xmlPullParser.getName().equals("low") &&lowCount<=4) {
                                  eventType = xmlPullParser.next() ;
-                                 todayWeather.setLow(xmlPullParser.getText().substring(2).trim());
+                                 todayWeather.setLow(lowCount, xmlPullParser.getText().substring(2).trim());
                                  lowCount++;
-                             } else if (xmlPullParser.getName().equals("type") && typeCount == 0) {
+                             } else if (xmlPullParser.getName().equals("type")&&typeCount<=4&&is_day) {
                                  eventType = xmlPullParser.next() ;
-                                 todayWeather.setType(xmlPullParser.getText());
+                                 todayWeather.setType(typeCount, xmlPullParser.getText());
                                  typeCount++;
                              }
                          }

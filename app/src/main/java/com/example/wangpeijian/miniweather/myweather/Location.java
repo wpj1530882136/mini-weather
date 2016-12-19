@@ -67,13 +67,13 @@ public class Location extends Activity implements View.OnClickListener{
         new Thread(new Runnable() {
             @Override
             public void run() {
-
-                if(myListener.getLocationInfo().equals("")){
-                        mHandler.postDelayed(this,2000);
-                } else{
+            if(myListener.getLocationInfo().equals("")){
+                    mHandler.postDelayed(this,2000);
+            } else{
                 Message msg =new Message();
                 msg.obj = myListener.getLocationInfo();
-                mHandler.sendMessage(msg);}
+                mHandler.sendMessage(msg);
+            }
             }
         }).run();
     }
